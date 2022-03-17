@@ -1,6 +1,6 @@
 
 function filter(arr) {
-    let input, filter, table, tr, td, i, txtValue,cond;
+    let input, filter, table, tr, td, i, txtValue,cont=0;
     input = document.getElementById("areatext");
     filter = input.value.toUpperCase();
     table = document.getElementById("xtablea");
@@ -12,16 +12,20 @@ function filter(arr) {
         for(let ele of arr[1]) {
             
             td = tr[i].getElementsByTagName("td")[ele];
-            console.log(ele);
+            
             if (td) {
                 txtValue = td.textContent || td.innerText;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
                     tr[i].style.display = "";
-                    cond=true;
+                    if(cont%2==0) tr[i].className = 'pair';
+                    else tr[i].className = 'odd';
+
+                    
+                    cont++;
                     break;
                 } else {
                     tr[i].style.display = "none";
-                    cond=false;
+                    
                 }
             }       
           

@@ -118,18 +118,89 @@ function eventCLick() {
     });
 }
 
+//-------------- TABLE ---------------
+
+// -----Relleno de la tabla con json
+//fillTitle : rellena los titulo de la tabla con los ingresados por el array
+//          dado el array init y el id de la tabla -> rellena los titulos de la tabla 
+function fillTitle(arr,idtab){
+    let tabhead = document.querySelector(`#${idtab} thead`);
+    let row  = document.createElement('tr');
+    arr[0].forEach(elem =>{
+        row.innerHTML +=`<th>${elem}</th>`
+    })
+    tabhead.appendChild(row);
+}
+ 
+
+//fillContent: rellena los registros de la tabla 
+//              dado el obj del json , el obj del registro y el array init ->
+//                  crea registros de la tabval con los campos ingresados por el array init q esten en el json
+function fillContent(obj,row,arrInit){
+    arrInit[1].forEach(elem =>{
+        let s=obj[`${elem}`];                           //tomamos el valor del elemento ingg en arr
+        row.innerHTML +=`<td name='${elem}'>${s}</td>`  //insrt un elem en elel registro
+    })
+    console.log()
+}
+
+
+
+
+
+// 
+// lines : cant de lineas que entran x pagina
+// active: nro de pagina activa del paginador
+// maxView :cant max de paginaciones
+function tableFill(json,lines,active,maxView,arrInit){
+
+    let i, row, tab = document.querySelector(`#${idtab} tbody`);
+    if(active==1){
+        
+    }elseif(active==maxView){
+
+        for (i= ((active-1)*lines)+1; i <json.length; i++) {
+            row  = document.createElement('tr')
+            fillContent(json[i],row,arrInit);
+            tab.appendChild(row);
+
+        }
+    }else{
+        for (i = (active*lines)+1; i < ((active*lines)+lines)+1; i++) {
+            row  = document.createElement('tr')
+            // const element = array[i];
+            fillContent(json[i],row,arrInit);
+            tab.appendChild(row);
+        }
+    }
+}
+
+
+
+
+// -----------------------------------
+
+
 
 // ----------------INICIALIZACIONES---------------
 const dots='...';
 let active = 1;
 let lines=15;
 let maxView = calcuPaginator(lines,vari.length);
+const arrinit = [["Raz.Soc.","Cod. Cliente","Email","Tel."],["razsoc","codcli","e_mail","telef"],["razsoc","codcli"]];
+const idtab = "xtablea" 
+
+
+// relleno con titulos
+fillTitle(arrinit,idtab)
+
 
 paginator(bottonsPaginator(1,maxView),'keypad')
 let botones = document.querySelectorAll(".button");
 eventCLick();
 
 
+tableFill(vari,lines,108,maxView,arrinit);
 
 
 
@@ -143,21 +214,20 @@ eventCLick();
 
 
 
+// //Utiliza para sacar el mensaje de error 
+// // msserrorInit:
+// // id de la tabla y el obj del mnj de error ->   esconde el mensaje y pone visible los titulos
+// function msserrorInit(idtab,meserror){
+//     meserror.style.display = "none";
+//     document.querySelector(`#${idtab} thead`).style.display = "";
+// }
 
-//Utiliza para sacar el mensaje de error 
-// msserrorInit:
-// id de la tabla y el obj del mnj de error ->   esconde el mensaje y pone visible los titulos
-function msserrorInit(idtab,meserror){
-    meserror.style.display = "none";
-    document.querySelector(`#${idtab} thead`).style.display = "";
-}
 
-
-// Utiliza para mostrar el mensaje de error 
-//  msserror: 
-//          id de la tabla y el obj del mnj error -> 
-function msserror(idtab,meserror){
-    document.querySelector(`#${idtab} thead`).style.display = "none";
-    meserror.textContent = 'No se encontro ningun registro';
-    meserror.style.display = "";
-}
+// // Utiliza para mostrar el mensaje de error 
+// //  msserror: 
+// //          id de la tabla y el obj del mnj error -> 
+// function msserror(idtab,meserror){
+//     document.querySelector(`#${idtab} thead`).style.display = "none";
+//     meserror.textContent = 'No se encontro ningun registro';
+//     meserror.style.display = "";
+// }

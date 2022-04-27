@@ -102,14 +102,23 @@ function buttonAccion(input,maxView,activ) {
 }
 
 
-
+//evento que se aplicara on click en los botones del paginador
 const whenClicked = function (evento) {
+    //tomamos el numero de boton seleccionado el cual pasa a ser el activo
     active = buttonAccion(this.innerText,maxView,active);
+    
+    //creacion de paginador  
     paginator(bottonsPaginator(active,maxView),'keypad');
     botones = document.querySelectorAll(".button");
     eventCLick();
     emptyTable(idtab);
-    tableFill(json,lines,active,maxView,arrInit);
+
+    if(input.value==''){
+        tableFill(json,lines,active,maxView,arrInit);
+    }else{
+        let jsonFilter = json.filter(filterArr);
+        tableFill(jsonFilter,lines,active,maxView,arrInit);
+    }
   
 }
 
@@ -142,7 +151,7 @@ function fillContent(obj,row,arrInit){
         let s=obj[`${elem}`];                           //tomamos el valor del elemento ingg en arr
         row.innerHTML +=`<td name='${elem}'>${s}</td>`  //insrt un elem en elel registro
     })
-    console.log()
+
 }
 
 
@@ -167,8 +176,7 @@ function tableFill(json,lines,active,maxView,arrInit){
         //condicional para definir la variable a la que va a ir la variable i
         if(active==maxView){conditional=json.length}else{conditional=(active*lines)}
         for (i= ((active-1)*lines); i <conditional; i++) {
-            console.log(i)
-            row  = document.createElement('tr')
+            row  = document.createElement('tr');
             fillContent(json[i],row,arrInit);
             tab.appendChild(row);
 
@@ -184,7 +192,7 @@ function filterArr(value){
     //tomamos el elem del buscador 
 
     let toFilter = input.value.toUpperCase();
-    
+    if(toFilter=='')return true;
     // recorremos los elementos a filtrar para compararlos
     for(let ele of arrInit[2]) {
         if (value[`${ele}`].toUpperCase().indexOf(toFilter) > -1) {
@@ -201,6 +209,7 @@ function filter(){
     maxView = calcuPaginator(lines,jsonFilter.length);
     paginator(bottonsPaginator(active,maxView),'keypad');
     botones = document.querySelectorAll(".button");
+    eventCLick();
     emptyTable(idtab);
     tableFill(jsonFilter,lines,active,maxView,arrInit);
 }

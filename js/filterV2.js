@@ -59,7 +59,7 @@ function bottonsPaginator(active,cantPags){
 
 //dado un array donde cada elemento representa a un boton y el id del div del Paginador
 // rellena el div con todos los botones del array
-function paginator(buttons,divBot = "keypad"){
+function paginator(buttons,divBot){
     let div =document.getElementById(divBot), but,parr;
     div.innerHTML='';
 
@@ -75,7 +75,8 @@ function paginator(buttons,divBot = "keypad"){
         else{
             but  = document.createElement('button');
             but.className="button";
-            but.value = `${element}` ;
+            but.id='butt'+element;
+            
             but.innerText=  `${element}`;
             div.appendChild(but);
         }
@@ -106,10 +107,15 @@ function buttonAccion(input,maxView,activ) {
 const whenClicked = function (evento) {
     //tomamos el numero de boton seleccionado el cual pasa a ser el activo
     active = buttonAccion(this.innerText,maxView,active);
-    
+
     //creacion de paginador  
-    paginator(bottonsPaginator(active,maxView),'keypad');
+    paginator(bottonsPaginator(active,maxView),idButtons);
     botones = document.querySelectorAll(".button");
+
+    //se aplica el 
+    let butact = document.querySelector("#butt"+active);
+    butact.className="button active";
+
     eventCLick();
     emptyTable(idtab);
 
@@ -186,15 +192,20 @@ function tableFill(json,lines,active,maxView,arrInit){
 
 
 //-------------- FILTER ---------------
-
+//filterArr:funcion que se utilizara para filter de un array donde dado el obj json
+//  tomamos los valores del ArrayInit para que tomen valor y los comparamos con los valores del json devolviendo true o false si es que esta incluido o no
 function filterArr(value){
     let cond=false;
-    //tomamos el elem del buscador 
-
+    
+    //tomamos el valor de la busqueda 
     let toFilter = input.value.toUpperCase();
+
+    // si es vacio no filtra nada
     if(toFilter=='')return true;
-    // recorremos los elementos a filtrar para compararlos
+
+    // recorremos los elementos del arrInit que tomaran valor
     for(let ele of arrInit[2]) {
+        // si el valor del json contiene a la busqueda -> true
         if (value[`${ele}`].toUpperCase().indexOf(toFilter) > -1) {
             return true;
         }
@@ -202,18 +213,56 @@ function filterArr(value){
     return cond;
 
 }
+
+//filter: funcion que se aplica al input para filtrar la tabla
 function filter(){
     let jsonFilter = json.filter(filterArr);
-    
+
+    if (jsonFilter.length==0) {
+        msserror(idtab,idButtons)
+    }else{
+        msserrorInit(idtab,idButtons)
+    }
+    //se reinicia el paginador y activo a 1
     active=1
     maxView = calcuPaginator(lines,jsonFilter.length);
-    paginator(bottonsPaginator(active,maxView),'keypad');
+    paginator(bottonsPaginator(active,maxView),idButtons);
     botones = document.querySelectorAll(".button");
     eventCLick();
+
+    // vacia la tabla
     emptyTable(idtab);
+    // rellena la tabla
     tableFill(jsonFilter,lines,active,maxView,arrInit);
 }
 
+// ----------------Mensaje de error ---------------
+
+
+
+
+//Utiliza para sacar el mensaje de error 
+// msserrorInit:
+// id de la tabla y el obj del mnj de error ->   esconde el mensaje y pone visible los titulos
+function msserrorInit(idtab,idbuttons){
+    let meserror=document.querySelector(`#${idError}`);
+    meserror.style.display = "none";
+    document.querySelector(`#${idtab} thead`).style.display = "";
+    document.querySelector(`#${idbuttons}`).style.display = "";
+}
+
+
+// Utiliza para mostrar el mensaje de error 
+//  msserror: 
+//          id de la tabla y el obj del mnj error -> 
+function msserror(idtab,idbuttons){
+    let meserror=document.querySelector(`#${idError}`);
+    document.querySelector(`#${idtab} thead`).style.display = "none";
+    document.querySelector(`#${idbuttons}`).style.display = "none";
+
+    meserror.textContent = 'No se encontro ningun registro';
+    meserror.style.display = "";
+}
 
 
 // ----------------INICIALIZACIONES---------------
@@ -221,54 +270,46 @@ const dots='...';
 let active = 1;
 let lines=15;
 let maxView = calcuPaginator(lines,json.length);
+
+//array inicial de configuracion de la tabla
+//Primer argumento arrinit[0] es el array de titulos
+//Segundo argumento arrinit[1] es el array de campos del json a mostrar
+//Tercer argumento arrinit[2] es el array de campos del json a filtrar
 const arrInit = [["Raz.Soc.","Cod. Cliente","Email","Tel."],["razsoc","codcli","e_mail","telef"],["razsoc","codcli"]];
-const idtab = "xtablea" ;
-const idAreaTEXT = "areatext" ;
+
+// id de la tabla
+const idtab = "xtablea";
 
 
-
+// id de la busqueda 
+const idAreaTEXT = "areatext";
 const input =document.getElementById(idAreaTEXT);
-let res =json.filter(filterArr)
+
+//id del div del paginador
+const idButtons = "keypad";
+
+// id del div del mensaje de error
+const idError = "error";
 
 // relleno con titulos
 fillTitle(arrInit,idtab)
 
+//Iniciamos los botones del paginador
+paginator(bottonsPaginator(1,maxView),idButtons)
+//Ponemos la clase active al primer boton
+document.querySelector("#butt"+active).className+=" active";
 
-paginator(bottonsPaginator(1,maxView),'keypad')
+//Tomamos todos los elementos con clase button es decir los botones del paginador
 let botones = document.querySelectorAll(".button");
+//le agregamos los eventos on clicka los botones
 eventCLick();
 
-
+//relleno de la tabla con los registros de la pagina 1
 tableFill(json,lines,1,maxView,arrInit);
 
-
-
-
-
-
-
-
+// 
 input.onkeyup = function(){filter();}
 
 
 
 
-
-
-// //Utiliza para sacar el mensaje de error 
-// // msserrorInit:
-// // id de la tabla y el obj del mnj de error ->   esconde el mensaje y pone visible los titulos
-// function msserrorInit(idtab,meserror){
-//     meserror.style.display = "none";
-//     document.querySelector(`#${idtab} thead`).style.display = "";
-// }
-
-
-// // Utiliza para mostrar el mensaje de error 
-// //  msserror: 
-// //          id de la tabla y el obj del mnj error -> 
-// function msserror(idtab,meserror){
-//     document.querySelector(`#${idtab} thead`).style.display = "none";
-//     meserror.textContent = 'No se encontro ningun registro';
-//     meserror.style.display = "";
-// }
